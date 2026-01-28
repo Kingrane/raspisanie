@@ -66,10 +66,10 @@ function App() {
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                         <div>
                             <h1 className="font-display font-bold text-4xl md:text-5xl uppercase tracking-tight mb-2">
-                                Расписание <span className="text-neo-pink">SFEDU</span>
+                                Расписание <span className="text-neo-pink">ФИИТ4</span>
                             </h1>
                             <p className="font-bold text-gray-600">
-                                Группа №98 • Институт Компьютерных Технологий и Информационной Безопасности
+                                ФИИТ4 • Мехматик
                             </p>
                         </div>
 

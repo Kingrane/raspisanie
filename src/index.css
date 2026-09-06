@@ -3,101 +3,97 @@
 @tailwind utilities;
 
 @layer base {
+    html {
+        background: #0e100f;
+    }
+
     body {
-        font-family: 'Inter', sans-serif;
+        @apply bg-canvas text-cream font-sans antialiased;
+        letter-spacing: -0.01em;
+    }
+
+    ::selection {
+        background: #0ae448;
+        color: #0e100f;
+    }
+
+    ::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: #0e100f;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: #42433d;
+        border-radius: 9999px;
     }
 }
 
 @layer components {
-    .neo-card {
-        @apply bg-white border-neo border-black shadow-neo transition-all duration-200;
+    /* Контурная кремовая пилюля — единственный тип кнопок в системе */
+    .pill {
+        @apply inline-flex items-center justify-center gap-1.5 rounded-full
+        border border-cream text-cream font-semibold
+        transition-colors duration-200 select-none;
+        padding: 8px 18px;
+        font-size: 14px;
+        line-height: 1.05;
     }
 
-    .neo-card:hover {
-        @apply shadow-neo-hover transform -translate-x-0.5 -translate-y-0.5;
+    .pill:hover {
+        background: rgba(255, 252, 225, 0.08);
     }
 
-    .neo-button {
-        @apply bg-neo-yellow border-neo border-black shadow-neo font-display font-bold
-        px-6 py-3 transition-all duration-200 active:shadow-none active:translate-x-1 active:translate-y-1
-        hover:shadow-neo-hover hover:-translate-x-0.5 hover:-translate-y-0.5;
+    .pill:disabled {
+        @apply border-hairline text-cream-muted cursor-not-allowed;
+        background: transparent;
     }
 
-    .neo-button-pink {
-        @apply bg-neo-pink border-neo border-black shadow-neo font-display font-bold
-        px-6 py-3 transition-all duration-200 active:shadow-none active:translate-x-1 active:translate-y-1
-        hover:shadow-neo-hover hover:-translate-x-0.5 hover:-translate-y-0.5;
+    /* Активная пилюля — заливка кремом, инверсия */
+    .pill-active {
+        @apply bg-cream text-canvas border-cream;
     }
 
-    .neo-button-blue {
-        @apply bg-neo-blue text-white border-neo border-black shadow-neo font-display font-bold
-        px-6 py-3 transition-all duration-200 active:shadow-none active:translate-x-1 active:translate-y-1
-        hover:shadow-neo-hover hover:-translate-x-0.5 hover:-translate-y-0.5;
+    /* Кастомный дропдаун в стилистике системы */
+    .field {
+        @apply relative rounded-full border border-cream bg-transparent
+        text-cream font-semibold outline-none appearance-none cursor-pointer
+        transition-colors duration-200;
+        padding: 8px 36px 8px 18px;
+        font-size: 14px;
+        line-height: 1.05;
     }
 
-    .neo-input {
-        @apply border-neo border-black p-3 shadow-neo-sm outline-none focus:shadow-neo
-        transition-all duration-200;
+    .field:hover {
+        background: rgba(255, 252, 225, 0.08);
     }
 
-    .neo-badge {
-        @apply inline-block border-2 border-black px-3 py-1 text-sm font-bold shadow-neo-sm;
+    .field:disabled {
+        @apply border-hairline text-cream-muted cursor-not-allowed;
+        background: transparent;
+    }
+
+    .field option {
+        background: #191919;
+        color: #fffce1;
+        font-weight: 500;
     }
 }
 
-@keyframes spin-neo {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-}
-
-.animate-spin-neo {
-    animation: spin-neo 1s linear infinite;
-}
-
-@keyframes pulse-neo {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-}
-
-.animate-pulse-neo {
-    animation: pulse-neo 2s ease-in-out infinite;
-}
-
-::-webkit-scrollbar {
-    width: 12px;
-}
-
-::-webkit-scrollbar-track {
-    background: #f0f0f0;
-    border-left: 3px solid black;
-}
-
-::-webkit-scrollbar-thumb {
-    background: #FFD600;
-    border: 3px solid black;
-    box-shadow: 2px 2px 0 black;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: #FF90E8;
-}
-
-/* Для компактного вида */
-.line-clamp-2 {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-}
-
-/* Уменьшаем тени в компактном режиме */
-.shadow-neo-sm {
-    box-shadow: 3px 3px 0px 0px rgba(0,0,0,1);
-}
-
-/* Адаптив для очень маленьких экранов */
-@media (max-width: 640px) {
-    .neo-button {
-        @apply px-3 py-2 text-xs;
+@keyframes fade-up {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
     }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-up {
+    animation: fade-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
 }

@@ -7,32 +7,26 @@ export default {
     theme: {
         extend: {
             colors: {
-                'neo-yellow': '#FFD600',
-                'neo-pink': '#FF90E8',
-                'neo-blue': '#23A6D5',
-                'neo-green': '#C1F2A5',
-                'neo-orange': '#FF7A5C',
-                'neo-purple': '#A78BFA',
-                'neo-black': '#000000',
-                'neo-white': '#FFFFFF',
-                'neo-gray': '#F0F0F0',
-                'neo-cold': '#EDF2FB',
+                canvas: '#0e100f',
+                panel: '#191919',
+                cream: '#fffce1',
+                'cream-muted': '#7c7c6f',
+                hairline: '#42433d',
+                green: '#0ae448',
+                'green-light': '#abff84',
+                orange: '#ff8709',
+                pink: '#fec5fb',
+                lilac: '#9d95ff',
+                blue: '#00bae2',
             },
             fontFamily: {
-                'sans': ['Inter', 'system-ui', 'sans-serif'],
-                'display': ['Space Grotesk', 'system-ui', 'sans-serif'],
+                sans: ['"Inter Tight"', 'Inter', 'system-ui', 'sans-serif'],
+                mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
             },
-            boxShadow: {
-                'neo': '5px 5px 0px 0px rgba(0,0,0,1)',
-                'neo-hover': '8px 8px 0px 0px rgba(0,0,0,1)',
-                'neo-sm': '3px 3px 0px 0px rgba(0,0,0,1)',
+            letterSpacing: {
+                display: '-0.02em',
+                tightest: '-0.011em',
             },
-            borderWidth: {
-                'neo': '3px',
-            },
-            transform: {
-                'neo-hover': 'translate(-2px, -2px)',
-            }
         },
     },
     plugins: [],

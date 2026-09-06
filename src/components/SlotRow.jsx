@@ -38,12 +38,12 @@ export const LessonCard = ({ lesson, hueClass, badgeStyle }) => {
                         </span>
                     )}
                     {lesson.isLecture && (
-                        <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] sm:text-[10.5px] font-mono text-cream-muted bg-white/[0.04] border border-hairline/60">
+                        <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] sm:text-[10.5px] font-mono text-cream-muted bg-cream/[0.05] border border-hairline/60">
                             лек.
                         </span>
                     )}
                     {lesson.hasSubgroups && (
-                        <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] sm:text-[10.5px] font-mono text-cream-muted bg-white/[0.04] border border-hairline/60">
+                        <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] sm:text-[10.5px] font-mono text-cream-muted bg-cream/[0.05] border border-hairline/60">
                             {lesson.subcount} подгр.
                         </span>
                     )}
@@ -84,7 +84,7 @@ export const LessonCard = ({ lesson, hueClass, badgeStyle }) => {
                         return (
                             <div
                                 key={i}
-                                className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-white/[0.04] border border-hairline/40 text-[10px] sm:text-[10.5px] font-mono text-cream-muted"
+                                className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-cream/[0.05] border border-hairline/40 text-[10px] sm:text-[10.5px] font-mono text-cream-muted"
                                 title={c.teachername ? `${c.teachername}` : undefined}
                             >
                                 <span className="text-cream font-medium">#{c.subnum}</span>
@@ -130,14 +130,14 @@ const SlotRow = ({ slot, lessonsByStart, dayCols, today, onEmptyClick }) => {
                 const isToday = today === day.num;
                 const hasLessons = lessons.length > 0;
                 const hueClass = DAY_HUES[day.num] || 'text-cream';
-                const badgeStyle = DAY_BADGE_STYLES[day.num] || 'border-cream/30 text-cream bg-white/5';
+                const badgeStyle = DAY_BADGE_STYLES[day.num] || 'border-cream/30 text-cream bg-cream/5';
 
                 return (
                     <div
                         key={day.num}
                         className={`min-h-[58px] border-t border-l border-hairline/60 ${
-                            isToday ? 'bg-white/[0.03]' : ''
-                        } ${hasLessons ? 'cursor-default' : 'cursor-pointer hover:bg-white/[0.02]'}`}
+                            isToday ? 'bg-cream/[0.04]' : ''
+                        } ${hasLessons ? 'cursor-default' : 'cursor-pointer hover:bg-cream/[0.03]'}`}
                         onClick={() => !hasLessons && onEmptyClick?.(day, slot)}
                     >
                         {hasLessons ? (

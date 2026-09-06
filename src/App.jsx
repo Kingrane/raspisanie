@@ -1,8 +1,9 @@
-import React, {useState, useEffect, useMemo, useCallback} from 'react';
+import React, {useState, useEffect, useMemo, useCallback, useRef} from 'react';
 import {RefreshCw, AlertCircle, Github} from 'lucide-react';
 import WeekToggle from './components/WeekToggle';
 import SlotRow, {LessonCard, DAY_HUES, DAY_BADGE_STYLES} from './components/SlotRow';
 import CustomSelect from './components/CustomSelect';
+import ThemeToggle from './components/ThemeToggle';
 import {mergeScheduleData, filterByWeek} from './utils/parser';
 import {fetchGroups, fetchSchedule, fetchWeek, DEGREE_LABELS} from './utils/api';
 
@@ -74,6 +75,37 @@ function App() {
     const today = new Date().getDay();
     const todayIdx = today === 0 ? 6 : today - 1;
     const [mobileDay, setMobileDay] = useState(() => (todayIdx >= 0 && todayIdx <= 5 ? todayIdx : 0));
+
+    const [theme, setTheme] = useState(() => {
+        const saved = readLS('rs_theme');
+        if (saved) return saved;
+        return typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches
+            ? 'light'
+            : 'dark';
+    });
+
+    useEffect(() => {
+        if (theme === 'light') {
+            document.documentElement.classList.add('light');
+        } else {
+            document.documentElement.classList.remove('light');
+        }
+        writeLS('rs_theme', theme);
+    }, [theme]);
+
+    const transitionTimerRef = useRef(null);
+
+    const toggleTheme = () => {
+        if (transitionTimerRef.current) {
+            clearTimeout(transitionTimerRef.current);
+        }
+        document.documentElement.classList.add('theme-transitioning');
+        setTheme(prev => (prev === 'dark' ? 'light' : 'dark'));
+        transitionTimerRef.current = setTimeout(() => {
+            document.documentElement.classList.remove('theme-transitioning');
+            transitionTimerRef.current = null;
+        }, 520);
+    };
 
     // 1. Грузим список курсов и групп (один раз)
     useEffect(() => {
@@ -276,6 +308,8 @@ function App() {
                                 />
                                 <span className="hidden sm:inline">Обновить</span>
                             </button>
+
+                            <ThemeToggle theme={theme} onToggle={toggleTheme} />
                         </div>
                     </div>
                 </div>
@@ -320,7 +354,7 @@ function App() {
                                                 className={`py-2 px-1 rounded-[10px] text-center transition-all flex flex-col items-center justify-center gap-0.5 ${
                                                     isSelected
                                                         ? 'bg-cream text-canvas font-semibold shadow'
-                                                        : 'border border-hairline/70 text-cream/90 hover:border-cream/40 bg-white/[0.02]'
+                                                        : 'border border-hairline/70 text-cream/90 hover:border-cream/40 bg-cream/[0.03]'
                                                 }`}
                                             >
                                                 <span className="text-[12px] uppercase tracking-wider">
@@ -364,7 +398,7 @@ function App() {
 
                                         if (activeSlots.length === 0) {
                                             return (
-                                                <div className="border border-hairline/60 rounded-[12px] p-8 text-center text-cream-muted font-mono text-[13px] bg-white/[0.02]">
+                                                <div className="border border-hairline/60 rounded-[12px] p-8 text-center text-cream-muted font-mono text-[13px] bg-cream/[0.03]">
                                                     Пар нет, можно отдыхать 🎉
                                                 </div>
                                             );
@@ -373,7 +407,7 @@ function App() {
                                         return activeSlots.map(({ slot, lessons }) => (
                                             <div
                                                 key={slot.start}
-                                                className="border border-hairline/70 rounded-[12px] bg-white/[0.02] p-3.5 flex flex-col gap-2.5"
+                                                className="border border-hairline/70 rounded-[12px] bg-cream/[0.03] p-3.5 flex flex-col gap-2.5"
                                             >
                                                 <div className="flex items-center justify-between border-b border-hairline/40 pb-2">
                                                     <div className="font-mono text-[12.5px] font-semibold text-cream flex items-center gap-2">
@@ -387,7 +421,7 @@ function App() {
                                                             <LessonCard
                                                                 lesson={lesson}
                                                                 hueClass={DAY_HUES[mobileDay] || 'text-cream'}
-                                                                badgeStyle={DAY_BADGE_STYLES[mobileDay] || 'border-cream/30 text-cream bg-white/5'}
+                                                                badgeStyle={DAY_BADGE_STYLES[mobileDay] || 'border-cream/30 text-cream bg-cream/5'}
                                                             />
                                                         </div>
                                                     ))}
@@ -411,7 +445,7 @@ function App() {
                                                 key={d.num}
                                                 className={`px-2.5 py-2.5 text-center border-l border-hairline/60 ${
                                                     todayIdx === d.num
-                                                        ? 'bg-white/[0.04]'
+                                                        ? 'bg-cream/[0.04]'
                                                         : ''
                                                 }`}
                                             >

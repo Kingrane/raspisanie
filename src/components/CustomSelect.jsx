@@ -55,8 +55,8 @@ const CustomSelect = ({
                     disabled
                         ? 'border-hairline text-cream-muted cursor-not-allowed opacity-50'
                         : isOpen
-                        ? 'bg-white/[0.08] text-cream'
-                        : 'text-cream hover:bg-white/[0.08]'
+                        ? 'bg-cream/[0.08] text-cream'
+                        : 'text-cream hover:bg-cream/[0.08]'
                 }`}
             >
                 <span className="truncate max-w-[160px] sm:max-w-[200px]">
@@ -84,8 +84,8 @@ const CustomSelect = ({
                                 onClick={() => handleSelect(optVal)}
                                 className={`w-full text-left px-3 py-2 rounded-[8px] text-[13px] sm:text-[14px] font-medium transition-colors flex items-center justify-between gap-3 ${
                                     isSelected
-                                        ? 'bg-white/[0.08] text-cream font-semibold'
-                                        : 'text-cream/90 hover:bg-white/[0.05] hover:text-cream'
+                                        ? 'bg-cream/[0.08] text-cream font-semibold'
+                                        : 'text-cream/90 hover:bg-cream/[0.06] hover:text-cream'
                                 }`}
                             >
                                 <span className="truncate">{label}</span>

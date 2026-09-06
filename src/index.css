@@ -3,8 +3,57 @@
 @tailwind utilities;
 
 @layer base {
+    :root {
+        --color-canvas: 14 16 15;
+        --color-panel: 25 25 25;
+        --color-cream: 255 252 225;
+        --color-cream-muted: 124 124 111;
+        --color-hairline: 66 67 61;
+        --color-green: 10 228 72;
+        --color-green-light: 171 255 132;
+        --color-orange: 255 135 9;
+        --color-pink: 254 197 251;
+        --color-lilac: 157 149 255;
+        --color-blue: 0 186 226;
+        color-scheme: dark;
+    }
+
+    html.light {
+        --color-canvas: 244 242 235;
+        --color-panel: 255 255 255;
+        --color-cream: 8 8 7;
+        --color-cream-muted: 65 63 56;
+        --color-hairline: 190 185 170;
+        --color-green: 5 150 105;
+        --color-green-light: 13 148 136;
+        --color-orange: 217 119 6;
+        --color-pink: 190 24 93;
+        --color-lilac: 79 70 229;
+        --color-blue: 2 132 199;
+        color-scheme: light;
+    }
+
     html {
-        background: #0e100f;
+        background-color: rgb(var(--color-canvas));
+    }
+
+    /* Silky-smooth theme transition on surfaces and borders without fighting icon transforms */
+    html.theme-transitioning,
+    html.theme-transitioning body,
+    html.theme-transitioning header,
+    html.theme-transitioning main,
+    html.theme-transitioning footer,
+    html.theme-transitioning .pill:not(.theme-toggle),
+    html.theme-transitioning .field,
+    html.theme-transitioning div[class*="border"],
+    html.theme-transitioning div[class*="bg-"] {
+        transition: background-color 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+                    border-color 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+                    color 0.25s ease !important;
+    }
+
+    .theme-toggle * {
+        transition-property: transform, opacity !important;
     }
 
     body {
@@ -13,8 +62,8 @@
     }
 
     ::selection {
-        background: #0ae448;
-        color: #0e100f;
+        background: rgb(var(--color-green));
+        color: rgb(var(--color-canvas));
     }
 
     ::-webkit-scrollbar {
@@ -23,11 +72,11 @@
     }
 
     ::-webkit-scrollbar-track {
-        background: #0e100f;
+        background: rgb(var(--color-canvas));
     }
 
     ::-webkit-scrollbar-thumb {
-        background: #42433d;
+        background: rgb(var(--color-hairline));
         border-radius: 9999px;
     }
 }
@@ -44,7 +93,7 @@
     }
 
     .pill:hover {
-        background: rgba(255, 252, 225, 0.08);
+        background: rgb(var(--color-cream) / 0.08);
     }
 
     .pill:disabled {
@@ -68,7 +117,7 @@
     }
 
     .field:hover {
-        background: rgba(255, 252, 225, 0.08);
+        background: rgb(var(--color-cream) / 0.08);
     }
 
     .field:disabled {
@@ -77,8 +126,8 @@
     }
 
     .field option {
-        background: #191919;
-        color: #fffce1;
+        background: rgb(var(--color-panel));
+        color: rgb(var(--color-cream));
         font-weight: 500;
     }
 }

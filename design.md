@@ -1,11 +1,13 @@
 # Gsap — Style Reference
 > animated chalkboard in a design studio. A near-black wall, warm cream chalk, and five color-coded highlighters — one for each animation discipline.
 
-**Theme:** dark
+**Theme:** dark / light (dual-theme with theme switcher)
 
-GSAP is a dark-canvas design language built for a motion library: a near-black stage where massive cream type, thin outlined pill buttons, and individually color-coded category labels create a typographic showcase rather than a traditional marketing site. The system runs on a single warm cream surface color (#fffce1) against an almost-black background, with category words each wearing their own vivid hue (green for the brand mark, orange for SVG, pink for Scroll, violet for Text, blue for UI) — color functions as taxonomy, not decoration. Typography is the hero: a single sans-serif (Mori) at six weights, pushing to 224px for the main headline with aggressive negative tracking and near-1.0 line-height, so words feel carved rather than laid out. Buttons are almost exclusively ghost-pills with 100px radius and hairline cream borders; there are no filled CTAs, which lets the gradient hero flourish and keeps every interactive element weightless.
+GSAP is a dual-canvas design language built for a motion library and schedule application: a near-black stage (Chalkboard) by default, and a warm paper stage (Warm Paper & Ink) for daylight reading. On both canvases, massive type, thin outlined pill buttons, and individually color-coded category labels create a typographic showcase rather than a traditional marketing site. In the dark theme, the system runs on a single warm cream surface color (#fffce1) against an almost-black background. In the light theme, the canvas shifts to a soft warm paper tone (#f4f2eb) with deep ink typography (#080807) and solid warm hairline borders (#beb9aa). Category words and days wear their own vivid hues (green, orange, pink, violet, blue) — color functions as taxonomy, not decoration. Typography is the hero: a single humanist sans-serif with negative tracking and tight line-height, so words feel carved rather than laid out. Buttons are exclusively ghost-pills with 100px radius and hairline borders, keeping interactive elements weightless.
 
 ## Colors
+
+### Dark Theme Palette (Chalkboard)
 
 | Name | Value | Role |
 |------|-------|------|
@@ -14,14 +16,30 @@ GSAP is a dark-canvas design language built for a motion library: a near-black s
 | Surface 50 | `#7c7c6f` | Muted secondary text, icon fills at rest, subhead annotations, disabled-state labels |
 | Surface 25 | `#42433d` | Hairline borders, dividers, low-contrast outlines against the black canvas |
 | Off Black | `#191919` | Alternative dark surface for nested panels and code blocks |
-| Shockingly Green | `linear-gradient(114.41deg, #0ae448 20.74%, #abff84 65.5%)` | Green text accent for links, tags, and emphasized short phrases. Do not promote it to the primary CTA color |
-| Light Green | `#abff84` | Green text accent for links, tags, and emphasized short phrases. Do not promote it to the primary CTA color |
-| Orangey | `#ff8709` | SVG category label, orange-tool icon fills, gradient endpoint in Orange Crush |
-| Pink | `#fec5fb` | Scroll category label, decorative splashes, gradient endpoint in Summer Fair |
-| Lilac | `#9d95ff` | Text category label, thin illustrative strokes, gradient endpoint in Purple Haze |
-| Blue | `#00bae2` | UI category label, gradient endpoint in Skyfall and Emerald City |
-| Core Green | `#dfffd1` | Subtle brand-tinted background washes for feature cards tied to the GSAP core |
-| Lipstick Pink | `#f100cb` | Deep gradient stop for expressive decorative gradients, not used for text or UI |
+| Shockingly Green | `linear-gradient(114.41deg, #0ae448 20.74%, #abff84 65.5%)` | Green text accent for links, tags, and emphasized short phrases |
+| Light Green | `#abff84` | Green text accent for links, tags, and emphasized short phrases |
+| Orangey | `#ff8709` | SVG category / Wednesday label, orange-tool icon fills |
+| Pink | `#fec5fb` | Scroll category / Thursday label, decorative splashes |
+| Lilac | `#9d95ff` | Text category / Friday label, thin illustrative strokes |
+| Blue | `#00bae2` | UI category / Monday label |
+| Core Green | `#dfffd1` | Subtle brand-tinted background washes |
+| Lipstick Pink | `#f100cb` | Deep gradient stop for expressive decorative gradients |
+
+### Light Theme Palette (Warm Paper & Ink)
+
+| Name | Value | Role |
+|------|-------|------|
+| Warm Paper Canvas | `#f4f2eb` | Primary page canvas, warm parchment preventing eye strain and glare |
+| Clean White Surface | `#ffffff` | Elevated panels, dropdown menus, and popovers |
+| Deep Ink | `#080807` | Primary text, headings, and high-contrast outlines |
+| Ink 50 (Muted) | `#413f38` | Secondary copy, teacher names, slot timestamps, muted badges |
+| Solid Warm Hairline | `#beb9aa` | Table grid borders, dividers, dropdown separation (clean, tactile borders without mud) |
+| Emerald Green | `#059669` | Brand mark, Tuesday category label (tuned for WCAG AA/AAA contrast on warm paper) |
+| Teal Green | `#0d9488` | Saturday category label, secondary green accents |
+| Amber Orange | `#d97706` | Wednesday category label, SVG category accent |
+| Berry Pink | `#be185d` | Thursday category label, Scroll accent |
+| Indigo Lilac | `#4f46e5` | Friday category label, Text accent |
+| Sky Blue | `#0284c7` | Monday category label, UI accent |
 
 ## Typography
 
@@ -126,6 +144,11 @@ Off-black #191919 background, 1px #42433d top divider, multi-column nav with cre
 
 Near-black surface with 8px corner radius, cream heading at 24–33px, no visible border, and a contained 16:9 or 1:1 preview area. Sits in a 2–3 column grid with 24px gaps. Padding 24px on all sides; preview art overflows the card slightly to suggest motion.
 
+### Theme Toggle Pill Button
+**Role:** Mode switch control in header navigation
+
+Ghost circular pill button (36x36px, `w-9 h-9`, 100px radius) with hairline border and subtle hover tint (`bg-cream/[0.04]`). Contains two layered icons (Sun in Amber `#d97706` and Moon in Cream `#fffce1`) positioned absolute within the button. Rotates 90° with simultaneous scale and opacity interpolation using a GSAP-styled `cubic-bezier(0.16, 1, 0.3, 1)` easing curve over 500ms. GPU acceleration enabled via `will-change: transform`. Switching triggers a coordinated 350ms color and border interpolation across layout containers.
+
 ## Do's and Don'ts
 
 ### Do
@@ -135,10 +158,12 @@ Near-black surface with 8px corner radius, cream heading at 24–33px, no visibl
 - Push the hero headline to 224px weight 600 with line-height 0.9 and -0.02em tracking; let it bleed to the viewport edge rather than centering it inside a max-width container.
 - Introduce every section with a curly-bracket annotation in `{ }` at 16–19px Mori 400 — this bracket pair is the site's recurring signature.
 - Place a 1px #42433d hairline divider between tool feature blocks, full section width, with no padding around it.
+- In light mode, maintain crisp contrast for grid borders using solid warm hairline `#beb9aa` instead of low-opacity faint greys.
+- In light mode, adjust chromatic category labels to deeper, daylight-calibrated tones (e.g. Emerald `#059669`, Amber `#d97706`, Sky `#0284c7`, Indigo `#4f46e5`, Berry `#be185d`) to meet WCAG AA legibility standards on warm paper.
 
 ### Don't
 - Don't add filled, solid-color CTA buttons — the system is outlined-only; the gradient-stroked pill is the maximum chromatic escalation allowed.
-- Don't use pure white (#ffffff) for text or #000000 for the background — the warmth of #fffce1 cream and #0e100f off-black is what gives the system its character.
+- Don't use pure white (#ffffff) for text in dark mode or pure black (#000000) for the background in either mode. In light mode, never use blinding raw white (#ffffff) as the base canvas; use Warm Paper `#f4f2eb`.
 - Don't set body type below 14px or above 23px; the type scale is binary between editorial display (66–224px) and compact UI (14–23px).
 - Don't introduce new category colors beyond the five-discipline palette; adding a sixth color dilutes the taxonomy that makes the system legible.
 - Don't apply drop shadows to cards or illustrations — depth is communicated only through gradient washes and surface-step shifts, never via box-shadow.
@@ -153,9 +178,15 @@ Near-black surface with 8px corner radius, cream heading at 24–33px, no visibl
 
 ## Surfaces
 
+### Dark Surfaces
 - **Canvas** (`#0e100f`) — Page background, all sections sit on this single dark stage
 - **Nested Panel** (`#191919`) — Footer and code-block backgrounds, one step lifted from the canvas
 - **Cream Surface** (`#fffce1`) — Light surface used sparingly for callout cards or promotional panels
+
+### Light Surfaces
+- **Warm Paper Canvas** (`#f4f2eb`) — Primary daylight stage, soft warm parchment preventing eye strain
+- **Clean White Surface** (`#ffffff`) — Elevated panels, dropdown menus, and popovers
+- **Subtle Tint Surface** (`rgb(var(--color-cream) / 0.04)`) — Dynamic hover washes and current-day cell highlighting
 
 ## Imagery
 

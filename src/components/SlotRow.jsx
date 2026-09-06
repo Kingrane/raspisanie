@@ -1,6 +1,6 @@
 import React from 'react';
 
-const DAY_HUES = {
+export const DAY_HUES = {
     0: 'text-blue',
     1: 'text-green',
     2: 'text-orange',
@@ -9,7 +9,7 @@ const DAY_HUES = {
     5: 'text-green-light',
 };
 
-const DAY_BADGE_STYLES = {
+export const DAY_BADGE_STYLES = {
     0: 'border-blue/30 text-blue bg-blue/5',
     1: 'border-green/30 text-green bg-green/5',
     2: 'border-orange/30 text-orange bg-orange/5',
@@ -18,7 +18,7 @@ const DAY_BADGE_STYLES = {
     5: 'border-green-light/30 text-green-light bg-green-light/5',
 };
 
-const LessonCard = ({ lesson, hueClass, badgeStyle }) => {
+export const LessonCard = ({ lesson, hueClass, badgeStyle }) => {
     const main = lesson.curricula[0];
     const teachers = [...new Set(lesson.curricula.map(c => c.teachername).filter(Boolean))];
 

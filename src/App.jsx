@@ -1,7 +1,8 @@
 import React, {useState, useEffect, useMemo, useCallback} from 'react';
 import {RefreshCw, AlertCircle, Github} from 'lucide-react';
 import WeekToggle from './components/WeekToggle';
-import SlotRow from './components/SlotRow';
+import SlotRow, {LessonCard, DAY_HUES, DAY_BADGE_STYLES} from './components/SlotRow';
+import CustomSelect from './components/CustomSelect';
 import {mergeScheduleData, filterByWeek} from './utils/parser';
 import {fetchGroups, fetchSchedule, fetchWeek, DEGREE_LABELS} from './utils/api';
 
@@ -72,6 +73,7 @@ function App() {
 
     const today = new Date().getDay();
     const todayIdx = today === 0 ? 6 : today - 1;
+    const [mobileDay, setMobileDay] = useState(() => (todayIdx >= 0 && todayIdx <= 5 ? todayIdx : 0));
 
     // 1. Грузим список курсов и групп (один раз)
     useEffect(() => {
@@ -237,35 +239,28 @@ function App() {
                         </div>
 
                         <div className="flex flex-wrap items-center gap-2.5">
-                            <select
+                            <CustomSelect
                                 value={gradeId ?? ''}
-                                onChange={e => changeGrade(e.target.value)}
-                                className="field"
+                                options={groupsData ? groupsData.map(g => ({ id: g.id, label: g.label })) : []}
+                                onChange={changeGrade}
+                                placeholder="Курсы…"
                                 disabled={!groupsData}
-                            >
-                                {!groupsData && <option value="">Курсы…</option>}
-                                {groupsData?.map(g => (
-                                    <option key={g.id} value={g.id}>
-                                        {g.label}
-                                    </option>
-                                ))}
-                            </select>
+                            />
 
-                            <select
+                            <CustomSelect
                                 value={groupId ?? ''}
-                                onChange={e => changeGroup(e.target.value)}
-                                className="field"
+                                options={
+                                    currentGrade?.groups
+                                        ? currentGrade.groups.map(g => ({
+                                              id: g.id,
+                                              label: `${g.name}${g.num ? '-' + g.num : ''}`
+                                          }))
+                                        : []
+                                }
+                                onChange={changeGroup}
+                                placeholder="Группа…"
                                 disabled={!gradeId}
-                            >
-                                {!gradeId && <option value="">Группа…</option>}
-                                {gradeId && groupsData
-                                    ?.find(g => g.id === gradeId)
-                                    ?.groups.map(g => (
-                                        <option key={g.id} value={g.id}>
-                                            {g.name}{g.num ? `-${g.num}` : ''}
-                                        </option>
-                                    ))}
-                            </select>
+                            />
 
                             <WeekToggle currentWeek={weekType} onChange={changeWeek} />
 
@@ -309,50 +304,146 @@ function App() {
                     {!groupsData || !groupId ? (
                         <Skeleton />
                     ) : (
-                        <div className="border border-hairline rounded-[8px] overflow-x-auto fade-up">
-                            <div className="min-w-[1088px]">
-                                {/* Шапка таблицы: дни недели */}
-                                <div className="grid grid-cols-[68px_repeat(6,minmax(170px,1fr))] border-b border-hairline">
-                                    <div className="sticky left-0 z-30 bg-canvas flex items-center px-2.5 py-2.5 font-mono text-[11px] text-cream-muted border-r border-hairline/60">
-                                        Время
+                        <React.Fragment>
+                            {/* Мобильный вид: вкладки дней недели + карточки пар */}
+                            <div className="md:hidden fade-up">
+                                {/* Переключатель дней недели */}
+                                <div className="grid grid-cols-6 gap-1.5 mb-3.5">
+                                    {DAYS.map(d => {
+                                        const isSelected = mobileDay === d.num;
+                                        const isToday = todayIdx === d.num;
+                                        return (
+                                            <button
+                                                key={d.num}
+                                                type="button"
+                                                onClick={() => setMobileDay(d.num)}
+                                                className={`py-2 px-1 rounded-[10px] text-center transition-all flex flex-col items-center justify-center gap-0.5 ${
+                                                    isSelected
+                                                        ? 'bg-cream text-canvas font-semibold shadow'
+                                                        : 'border border-hairline/70 text-cream/90 hover:border-cream/40 bg-white/[0.02]'
+                                                }`}
+                                            >
+                                                <span className="text-[12px] uppercase tracking-wider">
+                                                    {d.name.slice(0, 2)}
+                                                </span>
+                                                {isToday && (
+                                                    <span className={`w-1.5 h-1.5 rounded-full ${isSelected ? 'bg-canvas' : 'bg-green'}`} />
+                                                )}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+
+                                {/* Заголовок выбранного дня */}
+                                <div className="flex items-center justify-between mb-3 px-0.5">
+                                    <span className="text-[15px] font-semibold text-cream">
+                                        {DAYS[mobileDay]?.name}
+                                    </span>
+                                    {todayIdx === mobileDay && (
+                                        <span className="text-[11.5px] font-mono text-green font-medium">сегодня</span>
+                                    )}
+                                </div>
+
+                                {/* Список пар выбранного дня */}
+                                <div className="flex flex-col gap-3">
+                                    {(() => {
+                                        const dayLessons = lessonsByDay[mobileDay] || [];
+                                        const activeSlots = SLOTS.map(slot => {
+                                            const slotLessons = dayLessons.filter(l => l.start === slot.start);
+                                            const unique = [];
+                                            const seen = new Set();
+                                            for (const l of slotLessons) {
+                                                const key = `${l.uberid || l.id}-${l.timeslot}-${l.curricula?.[0]?.subjectname || ''}`;
+                                                if (!seen.has(key)) {
+                                                    seen.add(key);
+                                                    unique.push(l);
+                                                }
+                                            }
+                                            return { slot, lessons: unique };
+                                        }).filter(s => s.lessons.length > 0);
+
+                                        if (activeSlots.length === 0) {
+                                            return (
+                                                <div className="border border-hairline/60 rounded-[12px] p-8 text-center text-cream-muted font-mono text-[13px] bg-white/[0.02]">
+                                                    Пар нет, можно отдыхать 🎉
+                                                </div>
+                                            );
+                                        }
+
+                                        return activeSlots.map(({ slot, lessons }) => (
+                                            <div
+                                                key={slot.start}
+                                                className="border border-hairline/70 rounded-[12px] bg-white/[0.02] p-3.5 flex flex-col gap-2.5"
+                                            >
+                                                <div className="flex items-center justify-between border-b border-hairline/40 pb-2">
+                                                    <div className="font-mono text-[12.5px] font-semibold text-cream flex items-center gap-2">
+                                                        <span className="w-1.5 h-1.5 rounded-full bg-green" />
+                                                        <span>{slot.start} – {slot.end}</span>
+                                                    </div>
+                                                </div>
+                                                <div className="flex flex-col gap-2.5 divide-y divide-hairline/40">
+                                                    {lessons.map((lesson, idx) => (
+                                                        <div key={lesson.id || idx} className={idx > 0 ? 'pt-2.5' : ''}>
+                                                            <LessonCard
+                                                                lesson={lesson}
+                                                                hueClass={DAY_HUES[mobileDay] || 'text-cream'}
+                                                                badgeStyle={DAY_BADGE_STYLES[mobileDay] || 'border-cream/30 text-cream bg-white/5'}
+                                                            />
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        ));
+                                    })()}
+                                </div>
+                            </div>
+
+                            {/* Десктопный вид: полная недельная таблица */}
+                            <div className="hidden md:block border border-hairline rounded-[8px] overflow-x-auto fade-up">
+                                <div className="min-w-[1088px]">
+                                    {/* Шапка таблицы: дни недели */}
+                                    <div className="grid grid-cols-[68px_repeat(6,minmax(170px,1fr))] border-b border-hairline">
+                                        <div className="sticky left-0 z-30 bg-canvas flex items-center px-2.5 py-2.5 font-mono text-[11px] text-cream-muted border-r border-hairline/60">
+                                            Время
+                                        </div>
+                                        {DAYS.map(d => (
+                                            <div
+                                                key={d.num}
+                                                className={`px-2.5 py-2.5 text-center border-l border-hairline/60 ${
+                                                    todayIdx === d.num
+                                                        ? 'bg-white/[0.04]'
+                                                        : ''
+                                                }`}
+                                            >
+                                                <div className="font-semibold text-[14px] text-cream">
+                                                    {d.name}
+                                                </div>
+                                                <div className={`font-mono text-[10.5px] ${
+                                                    todayIdx === d.num ? 'text-green' : 'text-cream-muted'
+                                                }`}>
+                                                    {todayIdx === d.num ? 'сегодня' : ''}
+                                                </div>
+                                            </div>
+                                        ))}
                                     </div>
-                                    {DAYS.map(d => (
+
+                                    {/* Строки пар */}
+                                    {SLOTS.map(slot => (
                                         <div
-                                            key={d.num}
-                                            className={`px-2.5 py-2.5 text-center border-l border-hairline/60 ${
-                                                todayIdx === d.num
-                                                    ? 'bg-white/[0.04]'
-                                                    : ''
-                                            }`}
+                                            key={slot.start}
+                                            className="grid grid-cols-[68px_repeat(6,minmax(170px,1fr))]"
                                         >
-                                            <div className="font-semibold text-[14px] text-cream">
-                                                {d.name}
-                                            </div>
-                                            <div className={`font-mono text-[10.5px] ${
-                                                todayIdx === d.num ? 'text-green' : 'text-cream-muted'
-                                            }`}>
-                                                {todayIdx === d.num ? 'сегодня' : ''}
-                                            </div>
+                                            <SlotRow
+                                                slot={slot}
+                                                lessonsByStart={lessonsByDay}
+                                                dayCols={DAYS}
+                                                today={todayIdx}
+                                            />
                                         </div>
                                     ))}
                                 </div>
-
-                                {/* Строки пар */}
-                                {SLOTS.map(slot => (
-                                    <div
-                                        key={slot.start}
-                                        className="grid grid-cols-[68px_repeat(6,minmax(170px,1fr))]"
-                                    >
-                                        <SlotRow
-                                            slot={slot}
-                                            lessonsByStart={lessonsByDay}
-                                            dayCols={DAYS}
-                                            today={todayIdx}
-                                        />
-                                    </div>
-                                ))}
                             </div>
-                        </div>
+                        </React.Fragment>
                     )}
                 </div>
             </main>
@@ -360,7 +451,7 @@ function App() {
             <footer className="px-6 md:px-10 py-10">
                 <div className="max-w-[1600px] mx-auto flex flex-wrap items-center justify-between gap-4 border-t border-hairline pt-8">
                     <div className="font-mono text-[12px] text-cream-muted">
-                        © 2026 · расписание мехмата ЮФУ
+                        © 2026 · расписание мехмата ЮФУ · romka навайбкодил
                     </div>
                     <div className="flex items-center gap-6">
                         <a

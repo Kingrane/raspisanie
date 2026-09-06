@@ -111,7 +111,11 @@ function App() {
     useEffect(() => {
         const cached = readLS(LS_KEYS.groups);
         if (cached) {
-            setGroupsData(cached);
+            const normalized = cached.map(g => ({
+                ...g,
+                num: g.num ?? Number(g.label?.match(/(\d+)\s*курс/)?.[1]) ?? (g.id <= 4 ? g.id : g.id - 5),
+            }));
+            setGroupsData(normalized);
         }
         fetchGroups()
             .then(data => {
@@ -142,7 +146,7 @@ function App() {
         let activeGrade = groupsData.find(g => g.id === gradeId);
         if (!activeGrade) {
             // Ищем бакалавриат 2 курс по умолчанию
-            activeGrade = groupsData.find(g => g.degree === 'bachelor' && g.num === 2) || groupsData[0];
+            activeGrade = groupsData.find(g => g.degree === 'bachelor' && (g.num === 2 || g.id === 2)) || groupsData[0];
             setGradeId(activeGrade.id);
             writeLS(LS_KEYS.grade, activeGrade.id);
         }
@@ -266,7 +270,7 @@ function App() {
                             </h1>
                             <div className="font-mono text-[12px] sm:text-[13px] text-cream-muted mt-1.5">
                                 {currentGrade
-                                    ? `${DEGREE_LABELS[currentGrade.degree] || 'Курс'} · ${currentGrade.num} курс`
+                                    ? `${DEGREE_LABELS[currentGrade.degree] || 'Курс'} · ${currentGrade.num ?? currentGrade.label?.match(/\d+/)?.[0]} курс`
                                     : 'Мехмат · ЮФУ'}
                                 <span className="text-hairline mx-2">/</span>
                                 {groupName || 'группа не выбрана'}

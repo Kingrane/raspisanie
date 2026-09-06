@@ -34,6 +34,7 @@ export const fetchGroups = async () => {
     return wanted.map((g, i) => ({
         id: g.id,
         degree: g.degree,
+        num: g.num,
         label: `${DEGREE_LABELS[g.degree]}, ${g.num} курс`,
         groups: lists[i],
     }));

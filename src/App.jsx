@@ -162,15 +162,20 @@ function App() {
     }, [groupsData, gradeId, groupId]);
 
     // 3. Грузим расписание группы
-    const fetchScheduleFor = useCallback(async (gid) => {
+    const fetchScheduleFor = useCallback(async (gid, force = false) => {
         if (!gid) return;
-        setLoading(true);
-        setError(null);
 
         const cached = readLS(LS_KEYS.schedule(gid));
         if (cached) {
             setSchedule(cached);
+            if (!force) {
+                // Уже сохранено в кэше — не нагружаем сервер повторными фоновыми запросами
+                return;
+            }
         }
+
+        setLoading(true);
+        setError(null);
 
         try {
             const data = await fetchSchedule(gid);
@@ -247,7 +252,7 @@ function App() {
     };
 
     const refresh = () => {
-        fetchScheduleFor(groupId);
+        fetchScheduleFor(groupId, true);
     };
 
     return (

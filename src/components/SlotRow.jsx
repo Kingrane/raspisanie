@@ -18,48 +18,90 @@ export const DAY_BADGE_STYLES = {
     5: 'border-green-light/30 text-green-light bg-green-light/5',
 };
 
-export const LessonCard = ({ lesson, hueClass, badgeStyle }) => {
-    const main = lesson.curricula[0];
-    const teachers = [...new Set(lesson.curricula.map(c => c.teachername).filter(Boolean))];
+const formatRoom = (roomname) => {
+    const room = (roomname || '').trim();
+    if (!room || room === '?') return null;
+    return room.toLowerCase().includes('онлайн') ? room : `ауд. ${room}`;
+};
 
-    // Determine room display: if not subgroups, find distinct rooms
-    const distinctRooms = [...new Set(lesson.curricula.map(c => (c.roomname || '').trim()).filter(Boolean))];
+const SubgroupColumn = ({ entry, showSubject, hueClass, compact, isFirst, isLast }) => {
+    const room = formatRoom(entry.roomname);
+    const pad = compact
+        ? `${isFirst ? 'pr-1' : isLast ? 'pl-1' : 'px-1'}`
+        : `${isFirst ? 'pr-2' : isLast ? 'pl-2' : 'px-2'}`;
+    return (
+        <div className={`min-w-0 flex flex-col gap-0.5 ${pad} py-0.5`}>
+            <div className="font-mono text-[10px] sm:text-[10.5px] text-cream-muted leading-none">
+                {entry.subnum} подгр.
+            </div>
+            {showSubject && (
+                <div className={`font-semibold text-[12px] leading-snug break-words ${hueClass}`}>
+                    {entry.subjectname || entry.subjectabbr || 'Предмет'}
+                </div>
+            )}
+            {entry.teachername ? (
+                <div className="text-[11px] sm:text-[11.5px] leading-tight text-cream-muted break-words">
+                    {entry.teachername}
+                </div>
+            ) : null}
+            <div className="font-mono text-[11px] sm:text-[11.5px] text-cream font-medium leading-tight break-words">
+                {room || '—'}
+            </div>
+        </div>
+    );
+};
+
+export const LessonCard = ({ lesson, hueClass, badgeStyle }) => {
+    const curricula = [...(lesson.curricula || [])].sort(
+        (a, b) => (a.subnum || 0) - (b.subnum || 0)
+    );
+    const splitSubs = Boolean(lesson.hasSubgroups && curricula.length > 1);
+    const main = curricula[0];
+    const subjectNames = [...new Set(curricula.map(c => c.subjectname).filter(Boolean))];
+    const sharedSubject = subjectNames.length <= 1;
+
+    const teachers = splitSubs
+        ? []
+        : [...new Set(curricula.map(c => c.teachername).filter(Boolean))];
+
+    const distinctRooms = [...new Set(curricula.map(c => (c.roomname || '').trim()).filter(Boolean))];
     const validRooms = distinctRooms.filter(r => r !== '?');
     const primaryRoom = validRooms.length > 0 ? validRooms.join(', ') : null;
+    const compactSplit = curricula.length >= 3;
+    const showWeekBadge = lesson.type !== 'full';
+    const showRoom = !splitSubs && primaryRoom;
 
     return (
-        <div className="flex flex-col gap-1 text-left w-full">
-            {/* Top row: Badges and Room */}
-            <div className="flex items-center justify-between gap-1.5 flex-wrap">
-                <div className="flex items-center gap-1 flex-wrap">
-                    {lesson.type !== 'full' && (
-                        <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] sm:text-[10.5px] font-mono border ${badgeStyle}`}>
-                            {lesson.type === 'upper' ? '↑ верхняя неделя' : '↓ нижняя неделя'}
-                        </span>
-                    )}
-                    {lesson.isLecture && (
-                        <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] sm:text-[10.5px] font-mono text-cream-muted bg-cream/[0.05] border border-hairline/60">
-                            лек.
-                        </span>
-                    )}
-                    {lesson.hasSubgroups && (
-                        <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] sm:text-[10.5px] font-mono text-cream-muted bg-cream/[0.05] border border-hairline/60">
-                            {lesson.subcount} подгр.
-                        </span>
+        <div className="flex flex-col gap-1 text-left w-full min-w-0">
+            {(showWeekBadge || lesson.isLecture || showRoom) && (
+                <div className="flex items-center justify-between gap-1.5 flex-wrap">
+                    <div className="flex items-center gap-1 flex-wrap">
+                        {showWeekBadge && (
+                            <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] sm:text-[10.5px] font-mono border ${badgeStyle}`}>
+                                {lesson.type === 'upper' ? '↑ верхняя неделя' : '↓ нижняя неделя'}
+                            </span>
+                        )}
+                        {lesson.isLecture && (
+                            <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] sm:text-[10.5px] font-mono text-cream-muted bg-cream/[0.05] border border-hairline/60">
+                                лек.
+                            </span>
+                        )}
+                    </div>
+
+                    {showRoom && (
+                        <div className="font-mono text-[11.5px] text-cream font-medium shrink-0">
+                            {primaryRoom.toLowerCase().includes('онлайн') ? primaryRoom : `ауд. ${primaryRoom}`}
+                        </div>
                     )}
                 </div>
+            )}
 
-                {!lesson.hasSubgroups && primaryRoom && (
-                    <div className="font-mono text-[11.5px] text-cream font-medium shrink-0">
-                        {primaryRoom.toLowerCase().includes('онлайн') ? primaryRoom : `ауд. ${primaryRoom}`}
-                    </div>
-                )}
-            </div>
-
-            {/* Subject name */}
-            <div className={`font-semibold text-[13px] sm:text-[14px] leading-snug break-words ${hueClass}`}>
-                {main?.subjectname || main?.subjectabbr || 'Предмет'}
-            </div>
+            {/* Subject name — once, when all subgroups share it */}
+            {(!splitSubs || sharedSubject) && (
+                <div className={`font-semibold text-[13px] sm:text-[14px] leading-snug break-words ${hueClass}`}>
+                    {main?.subjectname || main?.subjectabbr || 'Предмет'}
+                </div>
+            )}
 
             {/* Teachers */}
             {teachers.length > 0 && (
@@ -76,22 +118,24 @@ export const LessonCard = ({ lesson, hueClass, badgeStyle }) => {
                 </div>
             )}
 
-            {/* Subgroups breakdown (if multiple subgroups) */}
-            {lesson.hasSubgroups && lesson.curricula.length > 0 && (
-                <div className="mt-1 pt-1 border-t border-hairline/40 flex flex-wrap gap-1">
-                    {lesson.curricula.map((c, i) => {
-                        const room = c.roomname && c.roomname.trim() !== '?' ? c.roomname.trim() : null;
-                        return (
-                            <div
-                                key={i}
-                                className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-cream/[0.05] border border-hairline/40 text-[10px] sm:text-[10.5px] font-mono text-cream-muted"
-                                title={c.teachername ? `${c.teachername}` : undefined}
-                            >
-                                <span className="text-cream font-medium">#{c.subnum}</span>
-                                <span>{room ? (room.toLowerCase().includes('онлайн') ? room : `ауд. ${room}`) : '—'}</span>
-                            </div>
-                        );
-                    })}
+            {/* Подгруппы: первая слева, вторая справа, все в одной клетке */}
+            {splitSubs && (
+                <div className="mt-0.5 flex w-full min-w-0">
+                    {curricula.map((c, i) => (
+                        <div
+                            key={c.id || `${c.subnum}-${i}`}
+                            className={`flex-1 min-w-0 ${i > 0 ? 'border-l border-hairline/50' : ''}`}
+                        >
+                            <SubgroupColumn
+                                entry={c}
+                                showSubject={!sharedSubject}
+                                hueClass={hueClass}
+                                compact={compactSplit}
+                                isFirst={i === 0}
+                                isLast={i === curricula.length - 1}
+                            />
+                        </div>
+                    ))}
                 </div>
             )}
         </div>

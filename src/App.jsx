@@ -31,8 +31,9 @@ const LS_KEYS = {
     group: 'rs_group',
     week: 'rs_week',
     groups: 'rs_groups',
-    schedule: id => `rs_schedule_${id}`,
 };
+
+const SS_SCHEDULE = id => `rs_schedule_${id}`;
 
 const readLS = key => {
     try {
@@ -48,6 +49,55 @@ const writeLS = (key, value) => {
     } catch {
         // localStorage может быть недоступен — это не критично
     }
+};
+
+// Кэш расписания живёт только пока открыта вкладка:
+// переключение групп — мгновенно, закрытие вкладки — запрос заново.
+const scheduleCache = new Map();
+
+try {
+    const stale = [];
+    for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k && k.startsWith('rs_schedule_')) stale.push(k);
+    }
+    stale.forEach(k => localStorage.removeItem(k));
+} catch {
+    // ignore
+}
+
+const readScheduleCache = gid => {
+    if (gid == null) return null;
+    if (scheduleCache.has(gid)) return scheduleCache.get(gid);
+    try {
+        const raw = sessionStorage.getItem(SS_SCHEDULE(gid));
+        if (!raw) return null;
+        const parsed = JSON.parse(raw);
+        scheduleCache.set(gid, parsed);
+        return parsed;
+    } catch {
+        return null;
+    }
+};
+
+const writeScheduleCache = (gid, data) => {
+    scheduleCache.set(gid, data);
+    try {
+        sessionStorage.setItem(SS_SCHEDULE(gid), JSON.stringify(data));
+    } catch {
+        // sessionStorage может быть недоступен — память всё равно держит кэш
+    }
+};
+
+const isFiit3 = g =>
+    (g.name || '').trim().toUpperCase() === 'ФИИТ' && Number(g.num) === 3;
+
+const findPreferredGroup = grade => {
+    if (!grade?.groups?.length) return null;
+    if (grade.degree === 'bachelor' && Number(grade.num) === 2) {
+        return grade.groups.find(isFiit3) || grade.groups[0];
+    }
+    return grade.groups[0];
 };
 
 const Skeleton = () => (
@@ -71,6 +121,8 @@ function App() {
     const [schedule, setSchedule] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const groupIdRef = useRef(groupId);
+    groupIdRef.current = groupId;
 
     const today = new Date().getDay();
     const todayIdx = today === 0 ? 6 : today - 1;
@@ -139,13 +191,12 @@ function App() {
         ? `${currentGroup.name}${currentGroup.num ? '-' + currentGroup.num : ''}`
         : '';
 
-    // 2. Инициализация курса и группы: по умолчанию Бакалавриат 2 курс, 1 группа ФИИТ
+    // 2. Инициализация курса и группы: по умолчанию Бакалавриат 2 курс, ФИИТ-3
     useEffect(() => {
         if (!groupsData || groupsData.length === 0) return;
 
         let activeGrade = groupsData.find(g => g.id === gradeId);
         if (!activeGrade) {
-            // Ищем бакалавриат 2 курс по умолчанию
             activeGrade = groupsData.find(g => g.degree === 'bachelor' && (g.num === 2 || g.id === 2)) || groupsData[0];
             setGradeId(activeGrade.id);
             writeLS(LS_KEYS.grade, activeGrade.id);
@@ -153,11 +204,7 @@ function App() {
 
         const currentInGrade = activeGrade.groups?.find(g => g.id === groupId);
         if (!currentInGrade) {
-            // Ищем группу ФИИТ 1, если нет — первую доступную
-            const fiit1 = activeGrade.groups?.find(
-                g => (g.name || '').toUpperCase().includes('ФИИТ') && Number(g.num) === 1
-            );
-            const fallbackGroup = fiit1 || activeGrade.groups?.[0];
+            const fallbackGroup = findPreferredGroup(activeGrade);
             if (fallbackGroup) {
                 setGroupId(fallbackGroup.id);
                 writeLS(LS_KEYS.group, fallbackGroup.id);
@@ -165,36 +212,42 @@ function App() {
         }
     }, [groupsData, gradeId, groupId]);
 
-    // 3. Грузим расписание группы
+    // 3. Грузим расписание группы (кэш — только на время вкладки)
     const fetchScheduleFor = useCallback(async (gid, force = false) => {
         if (!gid) return;
 
-        const cached = readLS(LS_KEYS.schedule(gid));
-        if (cached) {
+        const cached = readScheduleCache(gid);
+        if (cached && !force) {
             setSchedule(cached);
-            if (!force) {
-                // Уже сохранено в кэше — не нагружаем сервер повторными фоновыми запросами
-                return;
-            }
+            setLoading(false);
+            setError(null);
+            return;
         }
 
+        if (cached) {
+            setSchedule(cached);
+        } else if (groupIdRef.current === gid) {
+            setSchedule(null);
+        }
         setLoading(true);
         setError(null);
 
         try {
             const data = await fetchSchedule(gid);
             const merged = mergeScheduleData(data.lessons, data.curricula);
-            writeLS(LS_KEYS.schedule(gid), merged);
+            writeScheduleCache(gid, merged);
+            if (groupIdRef.current !== gid) return;
             setSchedule(merged);
         } catch (err) {
             console.error('schedule fetch failed:', err);
+            if (groupIdRef.current !== gid) return;
             if (!cached) {
                 setError('Не удалось загрузить расписание группы. Проверьте соединение.');
             } else {
                 setError('Ошибка сети — показываем сохраненное расписание.');
             }
         } finally {
-            setLoading(false);
+            if (groupIdRef.current === gid) setLoading(false);
         }
     }, []);
 
@@ -231,6 +284,25 @@ function App() {
         writeLS(LS_KEYS.week, w);
     };
 
+    const applyGroup = (id) => {
+        setGroupId(id);
+        writeLS(LS_KEYS.group, id);
+        if (!id) {
+            setSchedule(null);
+            return;
+        }
+        const cached = readScheduleCache(id);
+        if (cached) {
+            setSchedule(cached);
+            setLoading(false);
+            setError(null);
+        } else {
+            setSchedule(null);
+            setLoading(true);
+            setError(null);
+        }
+    };
+
     const changeGrade = (id) => {
         const num = id ? Number(id) : null;
         setGradeId(num);
@@ -238,21 +310,14 @@ function App() {
 
         if (num && groupsData) {
             const targetGrade = groupsData.find(g => g.id === num);
-            if (targetGrade?.groups?.length) {
-                const fiit1 = targetGrade.num === 2
-                    ? targetGrade.groups.find(g => (g.name || '').toUpperCase().includes('ФИИТ') && Number(g.num) === 1)
-                    : null;
-                const nextGroup = fiit1 || targetGrade.groups[0];
-                setGroupId(nextGroup.id);
-                writeLS(LS_KEYS.group, nextGroup.id);
-            }
+            const nextGroup = findPreferredGroup(targetGrade);
+            if (nextGroup) applyGroup(nextGroup.id);
         }
     };
 
     const changeGroup = (id) => {
         const num = id ? Number(id) : null;
-        setGroupId(num);
-        writeLS(LS_KEYS.group, num);
+        applyGroup(num);
     };
 
     const refresh = () => {
@@ -344,7 +409,7 @@ function App() {
 
             <main className="px-4 sm:px-6 md:px-10 flex-1">
                 <div className="max-w-[1600px] mx-auto">
-                    {!groupsData || !groupId ? (
+                    {!groupsData || !groupId || (loading && !schedule) ? (
                         <Skeleton />
                     ) : (
                         <React.Fragment>
@@ -506,7 +571,7 @@ function App() {
                             Официальное расписание
                         </a>
                         <a
-                            href="https://github.com/Kingrane/testtest"
+                            href="https://github.com/Kingrane/raspisanie"
                             target="_blank"
                             rel="noopener noreferrer"
                             className="pill !py-2 !px-4 !text-[13px]"

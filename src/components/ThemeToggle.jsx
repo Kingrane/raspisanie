@@ -8,7 +8,7 @@ const ThemeToggle = ({ theme, onToggle, className = '' }) => {
         <button
             type="button"
             onClick={onToggle}
-            className={`pill theme-toggle !p-0 !w-9 !h-9 flex items-center justify-center shrink-0 relative overflow-hidden transition-transform duration-200 active:scale-90 select-none ${className}`}
+            className={`pill theme-toggle !p-0 !w-[38px] !h-[38px] flex items-center justify-center shrink-0 relative overflow-hidden transition-transform duration-200 active:scale-90 select-none ${className}`}
             title={isDark ? 'Переключить на светлую тему' : 'Переключить на тёмную тему'}
             aria-label={isDark ? 'Переключить на светлую тему' : 'Переключить на тёмную тему'}
         >
@@ -20,7 +20,7 @@ const ThemeToggle = ({ theme, onToggle, className = '' }) => {
                         : 'rotate-0 scale-100 opacity-100 text-orange'
                 }`}
             >
-                <Sun size={17} className="stroke-[2.2]" />
+                <Sun size={16.5} className="stroke-[2.2]" />
             </div>
 
             {/* Луна (тёмная тема) */}
@@ -31,7 +31,7 @@ const ThemeToggle = ({ theme, onToggle, className = '' }) => {
                         : '-rotate-90 scale-0 opacity-0 pointer-events-none'
                 }`}
             >
-                <Moon size={16} className="stroke-[2.2]" />
+                <Moon size={15.5} className="stroke-[2.2]" />
             </div>
         </button>
     );

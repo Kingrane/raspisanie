@@ -1,29 +1,29 @@
-import React, {useState, useEffect, useMemo, useCallback, useRef} from 'react';
-import {RefreshCw, AlertCircle, Github} from 'lucide-react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { RefreshCw, AlertCircle, Github } from 'lucide-react';
 import WeekToggle from './components/WeekToggle';
-import SlotRow, {LessonCard, DAY_HUES, DAY_BADGE_STYLES} from './components/SlotRow';
+import SlotRow, { LessonCard, DAY_HUES, DAY_BADGE_STYLES } from './components/SlotRow';
 import CustomSelect from './components/CustomSelect';
 import ThemeToggle from './components/ThemeToggle';
-import {mergeScheduleData, filterByWeek} from './utils/parser';
-import {fetchGroups, fetchSchedule, fetchWeek, DEGREE_LABELS} from './utils/api';
+import { mergeScheduleData, filterByWeek } from './utils/parser';
+import { fetchGroups, fetchSchedule, fetchWeek, DEGREE_LABELS } from './utils/api';
 
 const DAYS = [
-    {num: 0, name: 'Понедельник'},
-    {num: 1, name: 'Вторник'},
-    {num: 2, name: 'Среда'},
-    {num: 3, name: 'Четверг'},
-    {num: 4, name: 'Пятница'},
-    {num: 5, name: 'Суббота'},
+    { num: 0, name: 'Понедельник' },
+    { num: 1, name: 'Вторник' },
+    { num: 2, name: 'Среда' },
+    { num: 3, name: 'Четверг' },
+    { num: 4, name: 'Пятница' },
+    { num: 5, name: 'Суббота' },
 ];
 
 const SLOTS = [
-    {start: '08:00', end: '09:35'},
-    {start: '09:50', end: '11:25'},
-    {start: '11:55', end: '13:30'},
-    {start: '13:45', end: '15:20'},
-    {start: '15:50', end: '17:25'},
-    {start: '17:40', end: '19:15'},
-    {start: '19:30', end: '21:05'},
+    { start: '08:00', end: '09:35' },
+    { start: '09:50', end: '11:25' },
+    { start: '11:55', end: '13:30' },
+    { start: '13:45', end: '15:20' },
+    { start: '15:50', end: '17:25' },
+    { start: '17:40', end: '19:15' },
+    { start: '19:30', end: '21:05' },
 ];
 
 const LS_KEYS = {
@@ -102,9 +102,9 @@ const findPreferredGroup = grade => {
 
 const Skeleton = () => (
     <div className="border border-hairline rounded-[8px] overflow-hidden">
-        <div className="grid grid-cols-[68px_repeat(6,minmax(170px,1fr))]">
-            {Array.from({length: 42}).map((_, i) => (
-                <div key={i} className="h-[58px] border-t border-l border-hairline/50 animate-pulse" />
+        <div className="grid grid-cols-[60px_repeat(6,minmax(160px,1fr))]">
+            {Array.from({ length: 42 }).map((_, i) => (
+                <div key={i} className="h-[46px] border-t border-l border-hairline/50 animate-pulse" />
             ))}
         </div>
     </div>
@@ -259,7 +259,7 @@ function App() {
     useEffect(() => {
         fetchWeek()
             .then(n => setApiWeek(n))
-            .catch(() => {});
+            .catch(() => { });
     }, []);
 
     const filtered = useMemo(
@@ -326,20 +326,20 @@ function App() {
 
     return (
         <div className="min-h-screen flex flex-col">
-            <header className="px-4 sm:px-6 md:px-10 pt-5 pb-3">
+            <header className="px-4 sm:px-6 md:px-10 pt-4 sm:pt-5 pb-2.5">
                 <div className="max-w-[1600px] mx-auto">
-                    <div className="flex flex-wrap items-baseline justify-between gap-x-8 gap-y-3">
+                    <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2.5">
                         <div>
-                            <h1 className="font-semibold text-[clamp(28px,5vw,50px)] leading-[0.95] tracking-display">
+                            <h1 className="font-semibold text-[clamp(26px,3.2vw,38px)] leading-tight tracking-display">
                                 РАСПИСАНИЕ
                             </h1>
-                            <div className="font-mono text-[12px] sm:text-[13px] text-cream-muted mt-1.5">
+                            <div className="font-mono text-[11.5px] sm:text-[12.5px] text-cream-muted mt-1">
                                 {currentGrade
                                     ? `${DEGREE_LABELS[currentGrade.degree] || 'Курс'} · ${currentGrade.num ?? currentGrade.label?.match(/\d+/)?.[0]} курс`
                                     : 'Мехмат · ЮФУ'}
-                                <span className="text-hairline mx-2">/</span>
+                                <span className="text-hairline mx-1.5">/</span>
                                 {groupName || 'группа не выбрана'}
-                                <span className="text-hairline mx-2">/</span>
+                                <span className="text-hairline mx-1.5">/</span>
                                 неделя: {currentWeekLabel}
                             </div>
                         </div>
@@ -358,9 +358,9 @@ function App() {
                                 options={
                                     currentGrade?.groups
                                         ? currentGrade.groups.map(g => ({
-                                              id: g.id,
-                                              label: `${g.name}${g.num ? '-' + g.num : ''}`
-                                          }))
+                                            id: g.id,
+                                            label: `${g.name}${g.num ? '-' + g.num : ''}`
+                                        }))
                                         : []
                                 }
                                 onChange={changeGroup}
@@ -373,7 +373,7 @@ function App() {
                             <button
                                 onClick={refresh}
                                 disabled={loading}
-                                className="pill"
+                                className="pill !py-2 !px-4 !text-[13px] h-[38px]"
                                 title="Обновить расписание"
                             >
                                 <RefreshCw
@@ -383,15 +383,15 @@ function App() {
                                 <span className="hidden sm:inline">Обновить</span>
                             </button>
 
-                            <ThemeToggle theme={theme} onToggle={toggleTheme} />
+                            <ThemeToggle theme={theme} onToggle={toggleTheme} className="!w-[38px] !h-[38px]" />
                         </div>
                     </div>
                 </div>
             </header>
 
             {groupErr && (
-                <div className="px-4 sm:px-6 md:px-10 pb-3">
-                    <div className="max-w-[1600px] mx-auto flex items-center gap-3 border border-orange text-orange rounded-[8px] px-4 py-2.5 text-sm font-medium">
+                <div className="px-4 sm:px-6 md:px-10 pb-2">
+                    <div className="max-w-[1600px] mx-auto flex items-center gap-2.5 border border-orange text-orange rounded-[8px] px-3.5 py-2 text-xs sm:text-sm font-medium">
                         <AlertCircle size={16} />
                         {groupErr}
                     </div>
@@ -399,8 +399,8 @@ function App() {
             )}
 
             {error && (
-                <div className="px-4 sm:px-6 md:px-10 pb-3">
-                    <div className="max-w-[1600px] mx-auto flex items-center gap-3 border border-orange text-orange rounded-[8px] px-4 py-2.5 text-sm font-medium">
+                <div className="px-4 sm:px-6 md:px-10 pb-2">
+                    <div className="max-w-[1600px] mx-auto flex items-center gap-2.5 border border-orange text-orange rounded-[8px] px-3.5 py-2 text-xs sm:text-sm font-medium">
                         <AlertCircle size={16} />
                         {error}
                     </div>
@@ -425,11 +425,10 @@ function App() {
                                                 key={d.num}
                                                 type="button"
                                                 onClick={() => setMobileDay(d.num)}
-                                                className={`py-2 px-1 rounded-[10px] text-center transition-all flex flex-col items-center justify-center gap-0.5 ${
-                                                    isSelected
-                                                        ? 'bg-cream text-canvas font-semibold shadow'
-                                                        : 'border border-hairline/70 text-cream/90 hover:border-cream/40 bg-cream/[0.03]'
-                                                }`}
+                                                className={`py-2 px-1 rounded-[10px] text-center transition-all flex flex-col items-center justify-center gap-0.5 ${isSelected
+                                                    ? 'bg-cream text-canvas font-semibold shadow'
+                                                    : 'border border-hairline/70 text-cream/90 hover:border-cream/40 bg-cream/[0.03]'
+                                                    }`}
                                             >
                                                 <span className="text-[12px] uppercase tracking-wider">
                                                     {d.name.slice(0, 2)}
@@ -508,27 +507,25 @@ function App() {
 
                             {/* Десктопный вид: полная недельная таблица */}
                             <div className="hidden md:block border border-hairline rounded-[8px] overflow-x-auto fade-up">
-                                <div className="min-w-[1088px]">
+                                <div className="min-w-[1020px]">
                                     {/* Шапка таблицы: дни недели */}
-                                    <div className="grid grid-cols-[68px_repeat(6,minmax(170px,1fr))] border-b border-hairline">
-                                        <div className="sticky left-0 z-30 bg-canvas flex items-center px-2.5 py-2.5 font-mono text-[11px] text-cream-muted border-r border-hairline/60">
+                                    <div className="grid grid-cols-[60px_repeat(6,minmax(160px,1fr))] border-b border-hairline">
+                                        <div className="sticky left-0 z-30 bg-canvas flex items-center px-2 py-1.5 font-mono text-[10px] text-cream-muted border-r border-hairline/60">
                                             Время
                                         </div>
                                         {DAYS.map(d => (
                                             <div
                                                 key={d.num}
-                                                className={`px-2.5 py-2.5 text-center border-l border-hairline/60 ${
-                                                    todayIdx === d.num
-                                                        ? 'bg-cream/[0.04]'
-                                                        : ''
-                                                }`}
+                                                className={`px-2 py-1 text-center border-l border-hairline/60 ${todayIdx === d.num
+                                                    ? 'bg-cream/[0.04]'
+                                                    : ''
+                                                    }`}
                                             >
-                                                <div className="font-semibold text-[14px] text-cream">
+                                                <div className="font-semibold text-[13px] text-cream leading-tight">
                                                     {d.name}
                                                 </div>
-                                                <div className={`font-mono text-[10.5px] ${
-                                                    todayIdx === d.num ? 'text-green' : 'text-cream-muted'
-                                                }`}>
+                                                <div className={`font-mono text-[9.5px] leading-tight ${todayIdx === d.num ? 'text-green' : 'text-cream-muted'
+                                                    }`}>
                                                     {todayIdx === d.num ? 'сегодня' : ''}
                                                 </div>
                                             </div>
@@ -539,7 +536,7 @@ function App() {
                                     {SLOTS.map(slot => (
                                         <div
                                             key={slot.start}
-                                            className="grid grid-cols-[68px_repeat(6,minmax(170px,1fr))]"
+                                            className="grid grid-cols-[60px_repeat(6,minmax(160px,1fr))]"
                                         >
                                             <SlotRow
                                                 slot={slot}
@@ -556,17 +553,17 @@ function App() {
                 </div>
             </main>
 
-            <footer className="px-6 md:px-10 py-10">
-                <div className="max-w-[1600px] mx-auto flex flex-wrap items-center justify-between gap-4 border-t border-hairline pt-8">
-                    <div className="font-mono text-[12px] text-cream-muted">
+            <footer className="px-3 sm:px-5 md:px-8 py-5 mt-auto">
+                <div className="max-w-[1600px] mx-auto flex flex-wrap items-center justify-between gap-3 border-t border-hairline/40 pt-2 text-[11px]">
+                    <div className="font-mono text-cream-muted">
                         © 2026 · расписание мехмата ЮФУ · romka навайбкодил
                     </div>
-                    <div className="flex items-center gap-6">
+                    <div className="flex items-center gap-4">
                         <a
                             href="https://schedule.sfedu.ru"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="pill !py-2 !px-4 !text-[13px]"
+                            className="pill !py-1 !px-3 !text-[11.5px]"
                         >
                             Официальное расписание
                         </a>
@@ -574,9 +571,9 @@ function App() {
                             href="https://github.com/Kingrane/raspisanie"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="pill !py-2 !px-4 !text-[13px]"
+                            className="pill !py-1 !px-3 !text-[11.5px]"
                         >
-                            <Github size={14} />
+                            <Github size={13} />
                             GitHub
                         </a>
                     </div>

@@ -28,23 +28,23 @@ const SubgroupColumn = ({ entry, showSubject, hueClass, compact, isFirst, isLast
     const room = formatRoom(entry.roomname);
     const pad = compact
         ? `${isFirst ? 'pr-1' : isLast ? 'pl-1' : 'px-1'}`
-        : `${isFirst ? 'pr-2' : isLast ? 'pl-2' : 'px-2'}`;
+        : `${isFirst ? 'pr-1.5' : isLast ? 'pl-1.5' : 'px-1.5'}`;
     return (
         <div className={`min-w-0 flex flex-col gap-0.5 ${pad} py-0.5`}>
-            <div className="font-mono text-[10px] sm:text-[10.5px] text-cream-muted leading-none">
+            <div className="font-mono text-[9.5px] sm:text-[10px] text-cream-muted leading-none">
                 {entry.subnum} подгр.
             </div>
             {showSubject && (
-                <div className={`font-semibold text-[12px] leading-snug break-words ${hueClass}`}>
+                <div className={`font-semibold text-[11.5px] leading-snug break-words ${hueClass}`}>
                     {entry.subjectname || entry.subjectabbr || 'Предмет'}
                 </div>
             )}
             {entry.teachername ? (
-                <div className="text-[11px] sm:text-[11.5px] leading-tight text-cream-muted break-words">
+                <div className="text-[10.5px] sm:text-[11px] leading-tight text-cream-muted break-words">
                     {entry.teachername}
                 </div>
             ) : null}
-            <div className="font-mono text-[11px] sm:text-[11.5px] text-cream font-medium leading-tight break-words">
+            <div className="font-mono text-[10.5px] sm:text-[11px] text-cream font-medium leading-tight break-words">
                 {room || '—'}
             </div>
         </div>
@@ -72,24 +72,24 @@ export const LessonCard = ({ lesson, hueClass, badgeStyle }) => {
     const showRoom = !splitSubs && primaryRoom;
 
     return (
-        <div className="flex flex-col gap-1 text-left w-full min-w-0">
+        <div className="flex flex-col gap-0.5 text-left w-full min-w-0">
             {(showWeekBadge || lesson.isLecture || showRoom) && (
-                <div className="flex items-center justify-between gap-1.5 flex-wrap">
+                <div className="flex items-center justify-between gap-1 flex-wrap">
                     <div className="flex items-center gap-1 flex-wrap">
                         {showWeekBadge && (
-                            <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] sm:text-[10.5px] font-mono border ${badgeStyle}`}>
+                            <span className={`inline-flex items-center px-1.5 py-0.2 rounded text-[9.5px] sm:text-[10px] font-mono leading-tight border ${badgeStyle}`}>
                                 {lesson.type === 'upper' ? '↑ верхняя неделя' : '↓ нижняя неделя'}
                             </span>
                         )}
                         {lesson.isLecture && (
-                            <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] sm:text-[10.5px] font-mono text-cream-muted bg-cream/[0.05] border border-hairline/60">
+                            <span className="inline-flex items-center px-1.5 py-0.2 rounded text-[9.5px] sm:text-[10px] font-mono leading-tight text-cream-muted bg-cream/[0.05] border border-hairline/60">
                                 лек.
                             </span>
                         )}
                     </div>
 
                     {showRoom && (
-                        <div className="font-mono text-[11.5px] text-cream font-medium shrink-0">
+                        <div className="font-mono text-[10.5px] sm:text-[11px] text-cream font-medium shrink-0">
                             {primaryRoom.toLowerCase().includes('онлайн') ? primaryRoom : `ауд. ${primaryRoom}`}
                         </div>
                     )}
@@ -98,21 +98,21 @@ export const LessonCard = ({ lesson, hueClass, badgeStyle }) => {
 
             {/* Subject name — once, when all subgroups share it */}
             {(!splitSubs || sharedSubject) && (
-                <div className={`font-semibold text-[13px] sm:text-[14px] leading-snug break-words ${hueClass}`}>
+                <div className={`font-semibold text-[12.5px] sm:text-[13px] leading-snug break-words ${hueClass}`}>
                     {main?.subjectname || main?.subjectabbr || 'Предмет'}
                 </div>
             )}
 
             {/* Teachers */}
             {teachers.length > 0 && (
-                <div className="text-cream-muted text-[11.5px] sm:text-[12px] leading-tight break-words">
+                <div className="text-cream-muted text-[11px] sm:text-[11.5px] leading-tight break-words">
                     {teachers.join(', ')}
                 </div>
             )}
 
             {/* Info line (e.g. format or time note) */}
             {lesson.info && (
-                <div className="font-mono text-[10.5px] text-cream-muted flex items-center gap-1.5 mt-0.5">
+                <div className="font-mono text-[10px] text-cream-muted flex items-center gap-1 mt-0.5 leading-tight">
                     <span className="w-1 h-1 rounded-full bg-cream-muted shrink-0" />
                     <span className="break-words">{lesson.info}</span>
                 </div>
@@ -143,7 +143,7 @@ export const LessonCard = ({ lesson, hueClass, badgeStyle }) => {
 };
 
 const EmptyCell = ({ label }) => (
-    <div className="flex items-center justify-center h-full min-h-[58px] px-2 py-2">
+    <div className="flex items-center justify-center h-full min-h-[46px] px-2 py-1">
         <span className="font-mono text-[11px] text-hairline select-none">{label}</span>
     </div>
 );
@@ -152,9 +152,9 @@ const SlotRow = ({ slot, lessonsByStart, dayCols, today, onEmptyClick }) => {
     return (
         <React.Fragment>
             {/* Ячейка времени */}
-            <div className="sticky left-0 z-20 bg-canvas flex flex-col justify-center px-2.5 py-2 border-t border-r border-hairline/60">
-                <div className="font-mono text-[13px] sm:text-[14px] text-cream font-medium">{slot.start}</div>
-                <div className="font-mono text-[10.5px] text-cream-muted">{slot.end}</div>
+            <div className="sticky left-0 z-20 bg-canvas flex flex-col justify-center px-2 py-1.5 border-t border-r border-hairline/60 select-none">
+                <div className="font-mono text-[12.5px] sm:text-[13px] text-cream font-medium leading-tight">{slot.start}</div>
+                <div className="font-mono text-[9.5px] sm:text-[10px] text-cream-muted leading-tight">{slot.end}</div>
             </div>
 
             {dayCols.map((day) => {
@@ -179,17 +179,17 @@ const SlotRow = ({ slot, lessonsByStart, dayCols, today, onEmptyClick }) => {
                 return (
                     <div
                         key={day.num}
-                        className={`min-h-[58px] border-t border-l border-hairline/60 ${
+                        className={`min-h-[46px] border-t border-l border-hairline/60 ${
                             isToday ? 'bg-cream/[0.04]' : ''
                         } ${hasLessons ? 'cursor-default' : 'cursor-pointer hover:bg-cream/[0.03]'}`}
                         onClick={() => !hasLessons && onEmptyClick?.(day, slot)}
                     >
                         {hasLessons ? (
-                            <div className="p-2 sm:p-2.5 flex flex-col justify-center gap-2 h-full">
+                            <div className="p-1.5 sm:p-2 flex flex-col justify-center gap-1.5 h-full">
                                 {lessons.map((lesson, idx) => (
                                     <div
                                         key={lesson.id || idx}
-                                        className={idx > 0 ? 'pt-2 border-t border-hairline/60' : ''}
+                                        className={idx > 0 ? 'pt-1.5 border-t border-hairline/60' : ''}
                                     >
                                         <LessonCard
                                             lesson={lesson}

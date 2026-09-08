@@ -51,7 +51,7 @@ const CustomSelect = ({
                 type="button"
                 disabled={disabled}
                 onClick={() => setIsOpen(!isOpen)}
-                className={`inline-flex items-center justify-between gap-2.5 rounded-full border border-cream font-semibold transition-colors duration-200 select-none py-2 px-4 text-[14px] leading-tight ${
+                className={`inline-flex items-center justify-between gap-2.5 rounded-full border border-cream font-semibold transition-colors duration-200 select-none py-2 px-4 text-[13.5px] leading-tight h-[38px] ${
                     disabled
                         ? 'border-hairline text-cream-muted cursor-not-allowed opacity-50'
                         : isOpen
@@ -59,12 +59,12 @@ const CustomSelect = ({
                         : 'text-cream hover:bg-cream/[0.08]'
                 }`}
             >
-                <span className="truncate max-w-[160px] sm:max-w-[200px]">
-                    {selectedOption?.label || selectedOption?.name || placeholder}
+                <span className="truncate max-w-[200px]">
+                    {selectedOption?.label || placeholder}
                 </span>
                 <ChevronDown
                     size={14}
-                    className={`text-cream-muted transition-transform duration-200 shrink-0 ${
+                    className={`shrink-0 transition-transform duration-200 text-cream/70 ${
                         isOpen ? 'rotate-180' : ''
                     }`}
                 />
@@ -82,7 +82,7 @@ const CustomSelect = ({
                                 key={optVal}
                                 type="button"
                                 onClick={() => handleSelect(optVal)}
-                                className={`w-full text-left px-3 py-2 rounded-[8px] text-[13px] sm:text-[14px] font-medium transition-colors flex items-center justify-between gap-3 ${
+                                className={`w-full text-left px-3 py-2 rounded-[8px] text-[13px] font-medium transition-colors flex items-center justify-between gap-2.5 ${
                                     isSelected
                                         ? 'bg-cream/[0.08] text-cream font-semibold'
                                         : 'text-cream/90 hover:bg-cream/[0.06] hover:text-cream'

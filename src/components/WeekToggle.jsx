@@ -8,12 +8,12 @@ const WeekToggle = ({ currentWeek, onChange }) => {
     ];
 
     return (
-        <div className="flex gap-2">
+        <div className="flex gap-1.5">
             {options.map(opt => (
                 <button
                     key={opt.value}
                     onClick={() => onChange(opt.value)}
-                    className={`pill !py-2 !px-4 !text-[13px] ${
+                    className={`pill !py-2 !px-3.5 !text-[13px] h-[38px] ${
                         currentWeek === opt.value ? 'pill-active' : ''
                     }`}
                 >

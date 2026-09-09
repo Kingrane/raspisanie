@@ -72,7 +72,7 @@ export const LessonCard = ({ lesson, hueClass, badgeStyle }) => {
     const showRoom = !splitSubs && primaryRoom;
 
     return (
-        <div className="flex flex-col gap-0.5 text-left w-full min-w-0">
+        <div className="flex flex-col gap-1.5 text-left w-full min-w-0">
             {(showWeekBadge || lesson.isLecture || showRoom) && (
                 <div className="flex items-center justify-between gap-1 flex-wrap">
                     <div className="flex items-center gap-1 flex-wrap">
@@ -179,9 +179,8 @@ const SlotRow = ({ slot, lessonsByStart, dayCols, today, onEmptyClick }) => {
                 return (
                     <div
                         key={day.num}
-                        className={`min-h-[46px] border-t border-l border-hairline/60 ${
-                            isToday ? 'bg-cream/[0.04]' : ''
-                        } ${hasLessons ? 'cursor-default' : 'cursor-pointer hover:bg-cream/[0.03]'}`}
+                        className={`min-h-[46px] border-t border-l border-hairline/60 ${isToday ? 'bg-cream/[0.04]' : ''
+                            } ${hasLessons ? 'cursor-default' : 'cursor-pointer hover:bg-cream/[0.03]'}`}
                         onClick={() => !hasLessons && onEmptyClick?.(day, slot)}
                     >
                         {hasLessons ? (

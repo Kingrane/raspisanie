@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { RefreshCw, AlertCircle, Github } from 'lucide-react';
 import WeekToggle from './components/WeekToggle';
-import SlotRow, { LessonCard, DAY_HUES, DAY_BADGE_STYLES } from './components/SlotRow';
+import SlotRow, { LessonCard, DAY_HUES, DAY_BADGE_STYLES, isWeekDimmed } from './components/SlotRow';
 import CustomSelect from './components/CustomSelect';
 import ThemeToggle from './components/ThemeToggle';
 import { mergeScheduleData, filterByWeek } from './utils/parser';
@@ -279,6 +279,14 @@ function App() {
     const currentWeekLabel = apiWeek === null
         ? '…'
         : apiWeek % 2 === 0 ? 'верхняя' : 'нижняя';
+
+    // В режиме «Все» пары, которые идут не на текущей неделе (по данным API),
+    // показываем полупрозрачными. Пары обеих недель (full) — обычные.
+    // При явном выборе «Верхняя»/«Нижняя» фильтр уже скрывает чужие пары — не затемняем.
+    const currentApiWeekType = apiWeek === null
+        ? null
+        : apiWeek % 2 === 0 ? 'upper' : 'lower';
+    const dimWeekType = weekType === 'all' ? currentApiWeekType : null;
     const changeWeek = (w) => {
         setWeekType(w);
         writeLS(LS_KEYS.week, w);
@@ -490,7 +498,10 @@ function App() {
                                                 </div>
                                                 <div className="flex flex-col gap-2.5 divide-y divide-hairline/40">
                                                     {lessons.map((lesson, idx) => (
-                                                        <div key={lesson.id || idx} className={idx > 0 ? 'pt-2.5' : ''}>
+                                                        <div
+                                                            key={lesson.id || idx}
+                                                            className={`${idx > 0 ? 'pt-2.5' : ''} ${isWeekDimmed(lesson, dimWeekType) ? 'opacity-40 transition-opacity' : ''}`}
+                                                        >
                                                             <LessonCard
                                                                 lesson={lesson}
                                                                 hueClass={DAY_HUES[mobileDay] || 'text-cream'}
@@ -543,6 +554,7 @@ function App() {
                                                 lessonsByStart={lessonsByDay}
                                                 dayCols={DAYS}
                                                 today={todayIdx}
+                                                activeWeekType={dimWeekType}
                                             />
                                         </div>
                                     ))}

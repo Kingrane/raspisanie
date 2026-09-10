@@ -18,6 +18,13 @@ export const DAY_BADGE_STYLES = {
     5: 'border-green-light/30 text-green-light bg-green-light/5',
 };
 
+// Пары, которые идут не на текущей неделе (актуально в режиме «Все»),
+// показываются полупрозрачными. Пары обеих недель (full) не затемняем.
+export const isWeekDimmed = (lesson, activeWeekType) =>
+    Boolean(activeWeekType) &&
+    (lesson.type === 'upper' || lesson.type === 'lower') &&
+    lesson.type !== activeWeekType;
+
 const formatRoom = (roomname) => {
     const room = (roomname || '').trim();
     if (!room || room === '?') return null;
@@ -148,7 +155,7 @@ const EmptyCell = ({ label }) => (
     </div>
 );
 
-const SlotRow = ({ slot, lessonsByStart, dayCols, today, onEmptyClick }) => {
+const SlotRow = ({ slot, lessonsByStart, dayCols, today, onEmptyClick, activeWeekType }) => {
     return (
         <React.Fragment>
             {/* Ячейка времени */}
@@ -188,7 +195,7 @@ const SlotRow = ({ slot, lessonsByStart, dayCols, today, onEmptyClick }) => {
                                 {lessons.map((lesson, idx) => (
                                     <div
                                         key={lesson.id || idx}
-                                        className={idx > 0 ? 'pt-1.5 border-t border-hairline/60' : ''}
+                                        className={`${idx > 0 ? 'pt-1.5 border-t border-hairline/60' : ''} ${isWeekDimmed(lesson, activeWeekType) ? 'opacity-40 transition-opacity' : ''}`}
                                     >
                                         <LessonCard
                                             lesson={lesson}

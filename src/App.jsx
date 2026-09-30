@@ -4,6 +4,7 @@ import WeekToggle from './components/WeekToggle';
 import SlotRow, { LessonCard, DAY_HUES, DAY_BADGE_STYLES, isWeekDimmed } from './components/SlotRow';
 import CustomSelect from './components/CustomSelect';
 import ThemeToggle from './components/ThemeToggle';
+import InstallButton from './components/InstallButton';
 import { mergeScheduleData, filterByWeek } from './utils/parser';
 import { fetchGroups, fetchSchedule, fetchWeek, DEGREE_LABELS } from './utils/api';
 
@@ -143,6 +144,16 @@ function App() {
             document.documentElement.classList.remove('light');
         }
         writeLS('rs_theme', theme);
+
+        // Цвет статус-бара установленного приложения следует за выбранной темой
+        let meta = document.head.querySelector('meta[name="theme-color"][data-dynamic]');
+        if (!meta) {
+            meta = document.createElement('meta');
+            meta.name = 'theme-color';
+            meta.dataset.dynamic = '';
+            document.head.appendChild(meta);
+        }
+        meta.content = theme === 'light' ? '#f4f2eb' : '#0e100f';
     }, [theme]);
 
     const transitionTimerRef = useRef(null);
@@ -566,29 +577,35 @@ function App() {
             </main>
 
             <footer className="px-3 sm:px-5 md:px-8 py-5 mt-auto">
-                <div className="max-w-[1600px] mx-auto flex flex-wrap items-center justify-between gap-3 border-t border-hairline/40 pt-2 text-[11px]">
-                    <div className="font-mono text-cream-muted">
-                        © 2026 · расписание мехмата ЮФУ · romka навайбкодил
+                <div className="max-w-[1600px] mx-auto border-t border-hairline/40 pt-2 text-[11px]">
+                    <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2.5">
+                        <div className="font-mono text-cream-muted">
+                            © 2026 · расписание мехмата ЮФУ · romka навайбкодил
+                        </div>
+                        <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+                            <a
+                                href="https://schedule.sfedu.ru"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="pill !py-1 !px-3 !text-[11.5px]"
+                            >
+                                Официальное расписание
+                            </a>
+                            <InstallButton />
+                            <a
+                                href="https://github.com/Kingrane/raspisanie"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="pill !py-1 !px-3 !text-[11.5px]"
+                            >
+                                <Github size={13} />
+                                GitHub
+                            </a>
+                        </div>
                     </div>
-                    <div className="flex items-center gap-4">
-                        <a
-                            href="https://schedule.sfedu.ru"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="pill !py-1 !px-3 !text-[11.5px]"
-                        >
-                            Официальное расписание
-                        </a>
-                        <a
-                            href="https://github.com/Kingrane/raspisanie"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="pill !py-1 !px-3 !text-[11.5px]"
-                        >
-                            <Github size={13} />
-                            GitHub
-                        </a>
-                    </div>
+                    <p className="mt-2 font-mono text-[10.5px] leading-snug text-cream-muted/70">
+                        Текст ниже этой строки добавляет хостинг-провайдер — к сайту он отношения не имеет.
+                    </p>
                 </div>
             </footer>
         </div>
